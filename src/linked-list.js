@@ -20,17 +20,15 @@ class LinkedList {
             this._tail = node;
         }
         this.length++;
-        return node;
+        return this;
     }
 
     head() {
-        if(this._head === null) return null;
-        return this._head.data;
+        return (this._head === null)? null : this._head.data;
     }
 
     tail() {
-        if(this._tail === null) return null;
-        return this._tail.data;
+        return (this._tail === null)? null : this._tail.data;
     }
 
     at(index) {
@@ -47,23 +45,35 @@ class LinkedList {
     insertAt(index, data) {
         let i = 0;
         let elem = this._head;
-        while(i !== index-1) {
-            elem = elem.next;
-            i++;
-        }
-
         let node = new Node(data);
-        node.prev = elem;
-        node.next = elem.next;
-        elem.next = node;
-        node.next.prev = node;
+        if(index !== 0) {
+            while(i !== index-1) {
+                elem = elem.next;
+                i++;
+            }
+            node.prev = elem;
+            node.next = elem.next;
+            elem.next = node;
+            node.next.prev = node;
+        }
+        else {
+            if(this.length > 1) {
+                let a = this._head;
+                this._head.prev = node;
+                node.next = this._head;
+                this._head = node;
+            }
+            else {
+                this._head = node;
+                this._tail = node;
+            }
+        }
         this.length++;
         return this;
     }
 
     isEmpty() {
-        if(this.length === 0) return true;
-        else return false;
+        return (this.length === 0)? true : false;
     }
 
     clear() {
@@ -76,6 +86,12 @@ class LinkedList {
     deleteAt(index) {
         let i = 0;
         let elem = this._head;
+        if(this.length === 1) {
+            this._head = new Node;
+            this._tail = this._head;
+            this.length = 0;
+            return this;
+        }
         while(i !== index-1) {
             elem = elem.next;
             i++;
@@ -91,22 +107,23 @@ class LinkedList {
     reverse() {
         let elem = this._head;
         let firstElem = elem;
-        
-        while(elem.next.next !== null) {
+        if(this.length > 1) {
+            while(elem.next.next !== null) {
+                let change = elem.next;
+                firstElem.prev = change;
+                elem.next = change.next;
+                change.next.prev = elem;
+                change.next = firstElem;
+                change.prev = null;
+                firstElem = change;
+            }
             let change = elem.next;
             firstElem.prev = change;
-            elem.next = change.next;
-            change.next.prev = elem;
+            elem.next = null;
             change.next = firstElem;
             change.prev = null;
             firstElem = change;
         }
-        let change = elem.next;
-        firstElem.prev = change;
-        elem.next = null;
-        change.next = firstElem;
-        change.prev = null;
-        firstElem = change;
 
         let head = this._head;
         this._head = this._tail;
